@@ -253,20 +253,64 @@
             }
         }
 
-        @media (max-width: 768px) {
+        @media (max-width: 480px) {
+
+            /* Improved Controls Responsiveness */
+            .controls {
+                flex-direction: column;
+                width: 100%;
+                padding: 15px;
+                margin: 0 auto 20px;
+            }
+
+            .controls label {
+                width: 100%;
+                display: flex;
+                flex-direction: column;
+                gap: 5px;
+                font-size: 14px;
+            }
+
+            .controls input {
+                width: 100%;
+                font-size: 14px;
+                padding: 8px 12px;
+            }
+
+            #generateBtn,
+            #downloadBtn {
+                width: 100%;
+                margin: 5px 0;
+                padding: 12px;
+                order: 3;
+                /* Move buttons to bottom */
+            }
+
+            /* Planner Grid Adjustments */
             .planner {
-                grid-template-columns: 60px repeat(7, 1fr);
+                grid-template-columns: 35px repeat(7, 1fr);
+                font-size: 11px;
             }
 
             .cell,
             .day-header,
             .week-number {
-                min-height: 80px;
-                padding: 10px 3px;
+                min-height: 50px;
+                padding: 4px 1px;
+            }
+
+            .day-header {
+                font-size: 9px;
+                padding: 6px 1px;
+            }
+
+            .week-number {
+                font-size: 0.7em;
             }
 
             .day-label {
-                font-size: 10px;
+                font-size: 7px;
+                padding: 1px 3px;
             }
         }
 
@@ -364,11 +408,16 @@
 
 <body class="theme-default">
     <div class="theme-selector">
-        <div class="theme-option selected" style="background: #4a6fa5;" onclick="changeTheme('theme-default')" title="Default Theme"></div>
-        <div class="theme-option" style="background: #2c3e50;" onclick="changeTheme('theme-dark')" title="Dark Theme"></div>
-        <div class="theme-option" style="background: #a8d8ea;" onclick="changeTheme('theme-pastel')" title="Pastel Theme"></div>
-        <div class="theme-option" style="background: #3a5a40;" onclick="changeTheme('theme-nature')" title="Nature Theme"></div>
-        <div class="theme-option" style="background: #264653;" onclick="changeTheme('theme-modern')" title="Modern Theme"></div>
+        <div class="theme-option selected" style="background: #4a6fa5;" onclick="changeTheme('theme-default')"
+            title="Default Theme"></div>
+        <div class="theme-option" style="background: #2c3e50;" onclick="changeTheme('theme-dark')" title="Dark Theme">
+        </div>
+        <div class="theme-option" style="background: #a8d8ea;" onclick="changeTheme('theme-pastel')"
+            title="Pastel Theme"></div>
+        <div class="theme-option" style="background: #3a5a40;" onclick="changeTheme('theme-nature')"
+            title="Nature Theme"></div>
+        <div class="theme-option" style="background: #264653;" onclick="changeTheme('theme-modern')"
+            title="Modern Theme"></div>
     </div>
 
     <h1 id="title">مخطط أسبوعي</h1>
@@ -492,28 +541,28 @@
             const opt = {
                 margin: 0,
                 filename: "weekly_planner.pdf",
-                image: { type: "jpeg", quality: 0.95 },
+                image: { type: "png", quality: 1 },
                 jsPDF: {
                     unit: "mm",
-                    format: [widthInMM + 30, heightInMM + 30], // +20mm for margins
+                    format: [widthInMM + 30, heightInMM + 40],
                     orientation: widthInMM > heightInMM ? "landscape" : "portrait",
                     compress: true,
                     hotfixes: ["px_scaling"]
                 },
                 html2canvas: {
                     scale: canvasScale,
-                    width: plannerWidth,
+                    width: plannerWidth+20,
                     height: plannerHeight,
-                    windowWidth: plannerWidth,
+                    windowWidth: plannerWidth+10,
                     windowHeight: plannerHeight,
-                    x: -58,
-                    y: -50,
+                    x: -56,
+                    y: 0,
                     letterRendering: true,
                     useCORS: true,
                     scrollX: 0,
                     scrollY: 0,
                     letterRendering: true,
-                    useCORS: true, 
+                    useCORS: true,
                     onclone: (clonedDoc) => {
                         // Center the planner in the PDF
                         clonedDoc.body.style.display = 'flex';
@@ -540,9 +589,6 @@
                 .toPdf()
                 .get("pdf")
                 .then(pdf => {
-                    if (pdf.internal.getNumberOfPages() > 1) {
-                        pdf.deletePage(2);
-                    }
                     pdf.save();
                 })
                 .catch(err => {
