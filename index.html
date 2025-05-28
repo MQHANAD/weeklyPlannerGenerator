@@ -45,11 +45,7 @@
         }
 
         .controls {
-            margin-bottom: 30px;
-            padding: 20px;
-            background-color: white;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            padding: 15px;
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
@@ -96,6 +92,29 @@
 
         button:active {
             transform: translateY(0);
+        }
+
+        #plannerContainer {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        #plannerTitleContainer {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 15px;
+        }
+
+        #printableTitle {
+            color: var(--secondary-color);
+            font-size: 2.2rem;
+            margin: 0;
+            padding: 0;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         #plannerGrid {
@@ -214,6 +233,44 @@
             transform: scale(1.1);
         }
 
+        /* Title input styling */
+        .title-control {
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto 15px;
+        }
+        .flex{
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            flex-wrap: wrap;
+            direction: rtl;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        #titleInput {
+            width: 100%;
+            padding: 12px 15px;
+            font-size: 1.1rem;
+            text-align: center;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-family: var(--font-family);
+            transition: all 0.3s ease;
+        }
+
+        #titleInput:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 4px rgba(79, 195, 161, 0.25);
+            outline: none;
+        }
+
         @keyframes fadeIn {
             from {
                 opacity: 0;
@@ -232,8 +289,21 @@
                 background-color: white;
             }
 
-            .controls {
+            .controls,
+            .theme-selector {
                 display: none;
+            }
+
+            #plannerTitleContainer {
+                box-shadow: none;
+                border: none;
+                padding: 0;
+                margin-bottom: 10mm;
+            }
+
+            #printableTitle {
+                font-size: 28pt;
+                min-height: auto;
             }
 
             .planner {
@@ -253,9 +323,24 @@
             }
         }
 
-        @media (max-width: 480px) {
+        @media (max-width: 768px) {
+            #printableTitle {
+                font-size: 1.8rem;
+            }
 
-            /* Improved Controls Responsiveness */
+            .planner {
+                grid-template-columns: 50px repeat(7, 1fr);
+            }
+
+            .cell,
+            .day-header,
+            .week-number {
+                min-height: 80px;
+                padding: 10px 2px;
+            }
+        }
+
+        @media (max-width: 480px) {
             .controls {
                 flex-direction: column;
                 width: 100%;
@@ -282,11 +367,8 @@
                 width: 100%;
                 margin: 5px 0;
                 padding: 12px;
-                order: 3;
-                /* Move buttons to bottom */
             }
 
-            /* Planner Grid Adjustments */
             .planner {
                 grid-template-columns: 35px repeat(7, 1fr);
                 font-size: 11px;
@@ -297,6 +379,10 @@
             .week-number {
                 min-height: 50px;
                 padding: 4px 1px;
+            }
+
+            #printableTitle {
+                font-size: 1.5rem;
             }
 
             .day-header {
@@ -311,6 +397,16 @@
             .day-label {
                 font-size: 7px;
                 padding: 1px 3px;
+            }
+
+            /* Mobile styles for title input */
+            .title-control {
+                margin-bottom: 10px;
+            }
+
+            #titleInput {
+                padding: 10px;
+                font-size: 1rem;
             }
         }
 
@@ -340,14 +436,17 @@
             color: #ecf0f1;
         }
 
-        .theme-dark .controls {
-            background-color: #1a252f;
-            color: #ecf0f1;
-        }
+        .theme-dark .controls,
 
         .theme-dark .day-label {
             color: #3498db;
             background-color: rgba(26, 37, 47, 0.7);
+        }
+
+        .theme-dark #titleInput {
+            background-color: #1a252f;
+            color: #ecf0f1;
+            border-color: #415b74;
         }
 
         .theme-pastel {
@@ -364,7 +463,10 @@
             background-color: rgba(255, 255, 255, 0.8);
         }
 
-        .theme-pastel .controls {
+        .theme-pastel .controls,
+
+
+        .theme-pastel #titleInput {
             background-color: rgba(255, 255, 255, 0.9);
         }
 
@@ -386,6 +488,10 @@
             color: #3a5a40;
         }
 
+        .theme-nature #titleInput {
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+
         .theme-modern {
             --primary-color: #264653;
             --secondary-color: #2a9d8f;
@@ -402,6 +508,10 @@
 
         .theme-modern .day-label {
             color: #2a9d8f;
+        }
+
+        .theme-modern #titleInput {
+            background-color: white;
         }
     </style>
 </head>
@@ -420,16 +530,28 @@
             title="Modern Theme"></div>
     </div>
 
-    <h1 id="title">مخطط أسبوعي</h1>
+    <h1>مخطط أسبوعي</h1>
 
-    <div class="controls">
-        <label id="startDateLabel">تاريخ البداية: <input type="date" id="startDate"></label>
-        <label id="endDateLabel">تاريخ النهاية: <input type="date" id="endDate"></label>
-        <button onclick="generateGrid()" id="generateBtn">انشاء</button>
-        <button onclick="downloadPDF()" id="downloadBtn">تحميل PDF</button>
+
+
+    <div class="controls flex">
+        <div class="controls">
+            <label id="startDateLabel">تاريخ البداية: <input type="date" id="startDate"></label>
+            <label id="endDateLabel">تاريخ النهاية: <input type="date" id="endDate"></label>
+            <button onclick="generateGrid()" id="generateBtn">انشاء</button>
+            <button onclick="downloadPDF()" id="downloadBtn">تحميل PDF</button>
+        </div>
+        <div class="title-control">
+            <input type="text" id="titleInput" placeholder="أدخل عنوان المخطط هنا..." value="Planner 1">
+        </div>
     </div>
 
-    <div id="plannerGrid"></div>
+    <div id="plannerContainer">
+        <div id="plannerTitleContainer">
+            <h2 id="printableTitle">مخطط أسبوعي</h2>
+        </div>
+        <div id="plannerGrid"></div>
+    </div>
 
     <script>
         function changeTheme(themeName) {
@@ -440,7 +562,15 @@
             event.target.classList.add('selected');
         }
 
+        function updatePrintableTitle() {
+            const titleInput = document.getElementById("titleInput");
+            const printableTitle = document.getElementById("printableTitle");
+            printableTitle.textContent = titleInput.value || "Planner 1";
+        }
+
         function generateGrid() {
+            updatePrintableTitle(); // Update the printable title
+
             const startInput = new Date(document.getElementById("startDate").value);
             const endInput = new Date(document.getElementById("endDate").value);
             if (isNaN(startInput) || isNaN(endInput) || startInput > endInput) {
@@ -516,7 +646,7 @@
         }
 
         function downloadPDF() {
-            const planner = document.getElementById("plannerGrid");
+            const plannerContainer = document.getElementById("plannerContainer");
             const buttons = document.querySelectorAll("button");
 
             // Disable UI during generation
@@ -524,7 +654,7 @@
             const loader = showLoader();
 
             // Create a clone for accurate measurement and rendering
-            const plannerClone = planner.cloneNode(true);
+            const plannerClone = plannerContainer.cloneNode(true);
             plannerClone.style.visibility = 'hidden';
             plannerClone.style.position = 'absolute';
             plannerClone.style.left = '-9999px';
@@ -544,17 +674,17 @@
                 image: { type: "png", quality: 1 },
                 jsPDF: {
                     unit: "mm",
-                    format: [widthInMM + 30, heightInMM + 40],
+                    format: [widthInMM + 30, heightInMM * 1.2],
                     orientation: widthInMM > heightInMM ? "landscape" : "portrait",
                     compress: true,
                     hotfixes: ["px_scaling"]
                 },
                 html2canvas: {
                     scale: canvasScale,
-                    width: plannerWidth+20,
-                    height: plannerHeight,
-                    windowWidth: plannerWidth+10,
-                    windowHeight: plannerHeight,
+                    width: plannerWidth + 20,
+                    height: plannerHeight * 1.2,
+                    windowWidth: plannerWidth + 10,
+                    windowHeight: plannerHeight * 1.2,
                     x: -56,
                     y: 0,
                     letterRendering: true,
@@ -576,7 +706,7 @@
                             el.style.transition = "none";
                             if (el.classList.contains("cell")) el.style.opacity = "1";
                         });
-                        const clonedPlanner = clonedDoc.getElementById("plannerGrid");
+                        const clonedPlanner = clonedDoc.getElementById("plannerContainer");
                         clonedPlanner.style.margin = '0 auto';
                         clonedPlanner.style.transform = 'translate(0, 0)';
                     }
@@ -585,7 +715,7 @@
 
             html2pdf()
                 .set(opt)
-                .from(planner)
+                .from(plannerContainer)
                 .toPdf()
                 .get("pdf")
                 .then(pdf => {
@@ -644,6 +774,10 @@
 
             document.getElementById('startDate').valueAsDate = startDate;
             document.getElementById('endDate').valueAsDate = endDate;
+
+            // Set up title input
+            const titleInput = document.getElementById("titleInput");
+            titleInput.addEventListener('input', updatePrintableTitle);
 
             // Generate grid automatically on load
             generateGrid();
