@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Weekly Planner | مخطط أسبوعي</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4a6fa5;
+            --secondary-color: #166088;
+            --accent-color: #4fc3a1;
+            --light-bg: #f8f9fa;
+            --dark-text: #2c3e50;
+            --border-color: #e0e0e0;
+            --font-family: 'Tajawal', Arial, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+
+        body {
+            font-family: var(--font-family);
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f7fa;
+            color: var(--dark-text);
+        }
+
+        body[dir="ltr"] {
+            font-family: 'Roboto', Arial, sans-serif;
+            text-align: left;
+        }
+
+        h1 {
+            color: var(--secondary-color);
+            margin-bottom: 30px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .controls {
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            direction: rtl;
+        }
+
+        .controls label {
+            font-weight: 500;
+            color: var(--secondary-color);
+        }
+
+        .controls input {
+            padding: 8px 12px;
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            font-family: inherit;
+        }
+
+        .controls input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(79, 195, 161, 0.2);
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            font-family: inherit;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            margin: 5px;
+        }
+
+        button:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        #plannerGrid {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .planner {
+            display: grid;
+            grid-template-columns: 80px repeat(7, 1fr);
+            gap: 1px;
+            background-color: var(--border-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+            width: fit-content;
+            margin: 0 auto;
+            transform: translate(0, 0);
+        }
+
+        body.pdf-export {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 10mm;
+        }
+
+        .cell,
+        .day-header,
+        .week-number {
+            padding: 20px 5px;
+            min-height: 100px;
+            box-sizing: border-box;
+            position: relative;
+            page-break-inside: avoid;
+        }
+
+        .day-header {
+            font-weight: bold;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 15px 5px;
+            text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.2);
+        }
+
+        .week-number {
+            background-color: var(--secondary-color);
+            color: white;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+            text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.2);
+        }
+
+        .cell {
+            background-color: white;
+            padding: 5px;
+            text-align: right;
+            vertical-align: top;
+        }
+
+        body[dir="ltr"] .cell {
+            text-align: left;
+        }
+
+        .cell:hover {
+            background-color: #f0f7ff;
+            transform: scale(1.02);
+            z-index: 1;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .day-label {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            font-size: 10px;
+            font-weight: bold;
+            color: var(--secondary-color);
+            background-color: rgba(255, 255, 255, 0.7);
+            padding: 2px 6px;
+            border-radius: 12px;
+        }
+
+        body[dir="ltr"] .day-label {
+            right: auto;
+            left: 5px;
+        }
+
+        .theme-selector {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .theme-option {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .theme-option:hover {
+            transform: scale(1.1);
+        }
+
+        .theme-option.selected {
+            border: 2px solid var(--dark-text);
+            transform: scale(1.1);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media print {
+            body {
+                padding: 0;
+                background-color: white;
+            }
+
+            .controls {
+                display: none;
+            }
+
+            .planner {
+                box-shadow: none;
+                border: 1px solid #ddd;
+                transform: scale(0.9);
+                transform-origin: top center;
+                width: fit-content;
+                margin: 0 auto;
+            }
+
+            .cell,
+            .day-header,
+            .week-number {
+                min-height: 80px;
+                padding: 10px 3px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .planner {
+                grid-template-columns: 60px repeat(7, 1fr);
+            }
+
+            .cell,
+            .day-header,
+            .week-number {
+                min-height: 80px;
+                padding: 10px 3px;
+            }
+
+            .day-label {
+                font-size: 10px;
+            }
+        }
+
+        /* Theme Colors */
+        .theme-default {
+            --primary-color: #4a6fa5;
+            --secondary-color: #166088;
+            --accent-color: #4fc3a1;
+            --light-bg: #f8f9fa;
+            --dark-text: #2c3e50;
+            --border-color: #e0e0e0;
+        }
+
+        .theme-dark {
+            --primary-color: #2c3e50;
+            --secondary-color: #415b74;
+            --accent-color: #3498db;
+            --light-bg: #34495e;
+            --dark-text: #ecf0f1;
+            --border-color: #2c3e50;
+            background-color: #2d3947;
+            color: #ecf0f1;
+        }
+
+        .theme-dark .cell {
+            background-color: #34495e;
+            color: #ecf0f1;
+        }
+
+        .theme-dark .controls {
+            background-color: #1a252f;
+            color: #ecf0f1;
+        }
+
+        .theme-dark .day-label {
+            color: #3498db;
+            background-color: rgba(26, 37, 47, 0.7);
+        }
+
+        .theme-pastel {
+            --primary-color: #a8d8ea;
+            --secondary-color: #aa96da;
+            --accent-color: #fcbad3;
+            --light-bg: #ffffd2;
+            --dark-text: #484848;
+            --border-color: #aa96da;
+            background-color: #ffffd2;
+        }
+
+        .theme-pastel .cell {
+            background-color: rgba(255, 255, 255, 0.8);
+        }
+
+        .theme-pastel .controls {
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+
+        .theme-nature {
+            --primary-color: #3a5a40;
+            --secondary-color: #588157;
+            --accent-color: #a3b18a;
+            --light-bg: #dad7cd;
+            --dark-text: #344e41;
+            --border-color: #a3b18a;
+            background-color: #dad7cd;
+        }
+
+        .theme-nature .cell {
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+
+        .theme-nature .day-label {
+            color: #3a5a40;
+        }
+
+        .theme-modern {
+            --primary-color: #264653;
+            --secondary-color: #2a9d8f;
+            --accent-color: #e9c46a;
+            --light-bg: #f1faee;
+            --dark-text: #1d3557;
+            --border-color: #a8dadc;
+            background-color: #f1faee;
+        }
+
+        .theme-modern .cell {
+            background-color: white;
+        }
+
+        .theme-modern .day-label {
+            color: #2a9d8f;
+        }
+    </style>
+</head>
+
+<body class="theme-default">
+    <div class="theme-selector">
+        <div class="theme-option selected" style="background: #4a6fa5;" onclick="changeTheme('theme-default')" title="Default Theme"></div>
+        <div class="theme-option" style="background: #2c3e50;" onclick="changeTheme('theme-dark')" title="Dark Theme"></div>
+        <div class="theme-option" style="background: #a8d8ea;" onclick="changeTheme('theme-pastel')" title="Pastel Theme"></div>
+        <div class="theme-option" style="background: #3a5a40;" onclick="changeTheme('theme-nature')" title="Nature Theme"></div>
+        <div class="theme-option" style="background: #264653;" onclick="changeTheme('theme-modern')" title="Modern Theme"></div>
+    </div>
+
+    <h1 id="title">مخطط أسبوعي</h1>
+
+    <div class="controls">
+        <label id="startDateLabel">تاريخ البداية: <input type="date" id="startDate"></label>
+        <label id="endDateLabel">تاريخ النهاية: <input type="date" id="endDate"></label>
+        <button onclick="generateGrid()" id="generateBtn">انشاء</button>
+        <button onclick="downloadPDF()" id="downloadBtn">تحميل PDF</button>
+    </div>
+
+    <div id="plannerGrid"></div>
+
+    <script>
+        function changeTheme(themeName) {
+            document.body.className = themeName;
+            document.querySelectorAll('.theme-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            event.target.classList.add('selected');
+        }
+
+        function generateGrid() {
+            const startInput = new Date(document.getElementById("startDate").value);
+            const endInput = new Date(document.getElementById("endDate").value);
+            if (isNaN(startInput) || isNaN(endInput) || startInput > endInput) {
+                alert("يرجى إدخال تواريخ صحيحة");
+                return;
+            }
+
+            // Adjust to start of week (Sunday)
+            const startDate = new Date(startInput);
+            startDate.setDate(startDate.getDate() - startDate.getDay());
+
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            const planner = document.getElementById("plannerGrid");
+            planner.innerHTML = '';
+            planner.className = "planner";
+
+            const empty = document.createElement("div");
+            empty.className = "day-header";
+            empty.textContent = "Week";
+            planner.appendChild(empty);
+
+            // Day headers (Arabic)
+            const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            days.forEach(day => {
+                const header = document.createElement("div");
+                header.className = "day-header";
+                header.textContent = day;
+                planner.appendChild(header);
+            });
+
+            let current = new Date(startDate);
+            let weekNumber = 1;
+
+            while (current <= endInput) {
+                const weekCell = document.createElement("div");
+                weekCell.className = "week-number";
+                weekCell.textContent = weekNumber.toString().padStart(2, '0');
+                planner.appendChild(weekCell);
+                weekNumber++;
+
+                // Add 7 days (Sunday to Saturday)
+                for (let i = 0; i < 7; i++) {
+                    const cell = document.createElement("div");
+                    cell.className = "cell";
+
+                    // Check if current date is today
+                    const currentDate = new Date(current);
+                    currentDate.setHours(0, 0, 0, 0);
+                    if (currentDate.getTime() === today.getTime()) {
+                        cell.classList.add("current-day");
+                    }
+
+                    const dayNum = current.getDate();
+                    const monthName = current.toLocaleDateString('EN-EG', { month: 'long' });
+                    const dayLabel = dayNum === 1 ? `${monthName} ${dayNum}` : dayNum;
+
+                    cell.innerHTML = `<div class="day-label">${dayLabel}</div>`;
+                    planner.appendChild(cell);
+                    current.setDate(current.getDate() + 1);
+                }
+            }
+
+            // Add animation to cells after they're created
+            setTimeout(() => {
+                const cells = document.querySelectorAll('.cell');
+                cells.forEach((cell, index) => {
+                    cell.style.animation = `fadeIn 0.3s ease-out ${index * 0.05}s forwards`;
+                    cell.style.opacity = 0;
+                });
+            }, 50);
+        }
+
+        function downloadPDF() {
+            const planner = document.getElementById("plannerGrid");
+            const buttons = document.querySelectorAll("button");
+
+            // Disable UI during generation
+            buttons.forEach(btn => btn.disabled = true);
+            const loader = showLoader();
+
+            // Create a clone for accurate measurement and rendering
+            const plannerClone = planner.cloneNode(true);
+            plannerClone.style.visibility = 'hidden';
+            plannerClone.style.position = 'absolute';
+            plannerClone.style.left = '-9999px';
+            document.body.appendChild(plannerClone);
+
+            // Calculate dimensions after clone is in DOM
+            const plannerWidth = plannerClone.offsetWidth;
+            const plannerHeight = plannerClone.offsetHeight;
+            const widthInMM = plannerWidth * 0.264583;
+            const heightInMM = plannerHeight * 0.264583;
+
+            const opt = {
+                margin: 0,
+                filename: "weekly_planner.pdf",
+                image: { type: "jpeg", quality: 0.95 },
+                jsPDF: {
+                    unit: "mm",
+                    format: [widthInMM + 30, heightInMM + 30], // +20mm for margins
+                    orientation: widthInMM > heightInMM ? "landscape" : "portrait",
+                    compress: true,
+                    hotfixes: ["px_scaling"]
+                },
+                html2canvas: {
+                    scale: 2,
+                    width: plannerWidth,
+                    height: plannerHeight,
+                    windowWidth: plannerWidth,
+                    windowHeight: plannerHeight,
+                    x: -58,
+                    y: -50,
+                    letterRendering: true,
+                    useCORS: true,
+                    scrollX: 0,
+                    scrollY: 0,
+                    onclone: (clonedDoc) => {
+                        // Center the planner in the PDF
+                        clonedDoc.body.style.display = 'flex';
+                        clonedDoc.body.style.justifyContent = 'center';
+                        clonedDoc.body.style.alignItems = 'center';
+                        clonedDoc.body.style.margin = '0';
+                        clonedDoc.body.style.padding = '10mm';
+                        clonedDoc.body.style.minHeight = '100vh';
+                        clonedDoc.querySelectorAll("*").forEach(el => {
+                            el.style.animation = "none";
+                            el.style.transition = "none";
+                            if (el.classList.contains("cell")) el.style.opacity = "1";
+                        });
+                        const clonedPlanner = clonedDoc.getElementById("plannerGrid");
+                        clonedPlanner.style.margin = '0 auto';
+                        clonedPlanner.style.transform = 'translate(0, 0)';
+                    }
+                }
+            };
+
+            html2pdf()
+                .set(opt)
+                .from(planner)
+                .toPdf()
+                .get("pdf")
+                .then(pdf => {
+                    if (pdf.internal.getNumberOfPages() > 1) {
+                        pdf.deletePage(2);
+                    }
+                    pdf.save();
+                })
+                .catch(err => {
+                    console.error("PDF Error:", err);
+                    alert("حدث خطأ أثناء إنشاء PDF. يرجى المحاولة مرة أخرى.");
+                })
+                .finally(() => {
+                    buttons.forEach(btn => btn.disabled = false);
+                    document.body.removeChild(loader);
+                    document.body.removeChild(plannerClone);
+                });
+
+            function showLoader() {
+                const loader = document.createElement("div");
+                loader.innerHTML = `
+                    <div style="
+                        font-size: 24px; 
+                        color: var(--primary-color);
+                        background: white;
+                        padding: 20px;
+                        border-radius: 8px;
+                        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+                    ">
+                        جاري تحضير المخطط للطباعة...
+                    </div>
+                `;
+                loader.style.cssText = `
+                    position: fixed; 
+                    top: 0; 
+                    left: 0; 
+                    width: 100%; 
+                    height: 100%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    z-index: 1000;
+                    background: rgba(255,255,255,0.95);
+                    backdrop-filter: blur(2px);
+                `;
+                document.body.appendChild(loader);
+                return loader;
+            }
+        }
+
+        // Set default dates (current week)
+        window.onload = function () {
+            const today = new Date();
+            const startDate = new Date(today);
+            startDate.setDate(today.getDate() - today.getDay()); // Start of current week (Sunday)
+
+            const endDate = new Date(startDate);
+            endDate.setDate(startDate.getDate() + 13); // Two weeks
+
+            document.getElementById('startDate').valueAsDate = startDate;
+            document.getElementById('endDate').valueAsDate = endDate;
+
+            // Generate grid automatically on load
+            generateGrid();
+        };
+    </script>
+</body>
+
+</html>
