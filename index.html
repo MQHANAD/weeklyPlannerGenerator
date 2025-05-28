@@ -368,10 +368,17 @@
                 margin: 5px 0;
                 padding: 12px;
             }
+            #plannerTitleContainer {
+                box-shadow: none;
+                border: none;
+                padding: 0;
+                margin-bottom: 0;
+            }
 
             .planner {
                 grid-template-columns: 35px repeat(7, 1fr);
                 font-size: 11px;
+                margin-bottom: 15px;
             }
 
             .cell,
@@ -674,7 +681,7 @@
                 image: { type: "png", quality: 1 },
                 jsPDF: {
                     unit: "mm",
-                    format: [widthInMM + 30, heightInMM * 1.2],
+                    format: [widthInMM + 30, heightInMM * 1.3],
                     orientation: widthInMM > heightInMM ? "landscape" : "portrait",
                     compress: true,
                     hotfixes: ["px_scaling"]
@@ -682,9 +689,9 @@
                 html2canvas: {
                     scale: canvasScale,
                     width: plannerWidth + 20,
-                    height: plannerHeight * 1.2,
+                    height: plannerHeight * 1.3,
                     windowWidth: plannerWidth + 10,
-                    windowHeight: plannerHeight * 1.2,
+                    windowHeight: plannerHeight * 1.3,
                     x: -56,
                     y: 0,
                     letterRendering: true,
